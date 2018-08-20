@@ -1,0 +1,27 @@
+var ws;
+
+function connect() {
+    var username = document.getElementById("username").value;
+    
+    var host = document.location.host;
+    var pathname = document.location.pathname;
+    
+    ws = new WebSocket('ws://'+document.location.host+document.location.pathname.substring(0,document.location.pathname.lastIndexOf('/')) + "/chat/" + username);
+
+    ws.onmessage = function(event) {
+    var log = document.getElementById("log");
+        console.log(event.data);
+        var message = JSON.parse(event.data);
+        log.innerHTML += message.from + " : " + message.content + "\n";
+        log.scrollTop=log.scrollHeight;
+    };
+}
+
+function send() {
+    var content = document.getElementById("msg").value;
+    var json = JSON.stringify({
+        "content":content
+    });
+
+    ws.send(json);
+}
