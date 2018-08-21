@@ -10,6 +10,13 @@ function connect() {
     var log = document.getElementById("log");
         console.log(event.data);
         var message = JSON.parse(event.data);
+        if(message.from==undefined){
+            document.getElementById("connect").disabled=false;
+            document.getElementById("disconnect").disabled=true;
+        }else{
+            document.getElementById("connect").disabled=true;
+            document.getElementById("disconnect").disabled=false;
+        }
         log.innerHTML += "<p style=\"color:"+message.color+"\";>"+message.from + " : " + message.content + "</p>\n";
         log.scrollTop=log.scrollHeight;
     };
@@ -22,6 +29,12 @@ function connect() {
             input.value="";
         }
     });
+}
+
+function disconnect() {
+    ws.close();
+    document.getElementById("connect").disabled=false;
+    document.getElementById("disconnect").disabled=true;
 }
 
 function send() {

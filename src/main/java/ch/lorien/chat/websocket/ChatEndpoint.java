@@ -25,15 +25,22 @@ public class ChatEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username, @PathParam("color") String color) throws IOException, EncodeException {
-        this.session = session;
-        chatEndpoints.add(this);
-        User user = new User(username,color);
-        users.put(session.getId(), user);
-        Message message = new Message();
-        message.setFrom(user.getName());
-        message.setColor(user.getColor());
-        message.setContent("Connected!");
-        broadcast(message);
+        if(users.values().stream().filter(user -> user.getName().equals(username)).findAny().isPresent()){
+            Message message = new Message();
+            message.setContent(String.format("username: %s already in use, use another",username));
+            message.setColor("#ff0000");
+            session.getBasicRemote().sendObject(message);
+        }else {
+            this.session = session;
+            chatEndpoints.add(this);
+            User user = new User(username, color);
+            users.put(session.getId(), user);
+            Message message = new Message();
+            message.setFrom(user.getName());
+            message.setColor(user.getColor());
+            message.setContent("Connected!");
+            broadcast(message);
+        }
     }
 
 
@@ -51,6 +58,7 @@ public class ChatEndpoint {
         chatEndpoints.remove(this);
         Message message = new Message();
         User user=users.get(session.getId());
+        users.remove(session.getId());
         message.setFrom(user.getName());
         message.setColor(user.getColor());
         message.setContent("Disconnected!");
