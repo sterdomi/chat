@@ -1,9 +1,10 @@
-package com.baeldung.model;
+package ch.lorien.chat.model;
 
 public class Message {
     private String from;
     private String to;
     private String content;
+    private String color;
 
     @Override
     public String toString() {
@@ -32,5 +33,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

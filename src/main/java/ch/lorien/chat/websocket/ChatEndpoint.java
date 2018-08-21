@@ -1,4 +1,4 @@
-package com.baeldung.websocket;
+package ch.lorien.chat.websocket;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,30 +14,35 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import com.baeldung.model.Message;
+import ch.lorien.chat.model.User;
+import ch.lorien.chat.model.Message;
 
-@ServerEndpoint(value = "/chat/{username}", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
+@ServerEndpoint(value = "/chat/{username}/{color}", decoders = ch.lorien.chat.websocket.MessageDecoder.class, encoders = ch.lorien.chat.websocket.MessageEncoder.class)
 public class ChatEndpoint {
     private Session session;
     private static final Set<ChatEndpoint> chatEndpoints = new CopyOnWriteArraySet<>();
-    private static HashMap<String, String> users = new HashMap<>();
+    private static HashMap<String, User> users = new HashMap<>();
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("username") String username) throws IOException, EncodeException {
-
+    public void onOpen(Session session, @PathParam("username") String username, @PathParam("color") String color) throws IOException, EncodeException {
         this.session = session;
         chatEndpoints.add(this);
-        users.put(session.getId(), username);
-
+        User user = new User(username,color);
+        users.put(session.getId(), user);
         Message message = new Message();
-        message.setFrom(username);
+        message.setFrom(user.getName());
+        message.setColor(user.getColor());
         message.setContent("Connected!");
         broadcast(message);
     }
 
+
     @OnMessage
     public void onMessage(Session session, Message message) throws IOException, EncodeException {
-        message.setFrom(users.get(session.getId()));
+        User user=users.get(session.getId());
+        user.setColor(message.getColor());
+        message.setFrom(user.getName());
+        message.setColor(user.getColor());
         broadcast(message);
     }
 
@@ -45,7 +50,9 @@ public class ChatEndpoint {
     public void onClose(Session session) throws IOException, EncodeException {
         chatEndpoints.remove(this);
         Message message = new Message();
-        message.setFrom(users.get(session.getId()));
+        User user=users.get(session.getId());
+        message.setFrom(user.getName());
+        message.setColor(user.getColor());
         message.setContent("Disconnected!");
         broadcast(message);
     }

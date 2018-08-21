@@ -1,11 +1,12 @@
-package com.baeldung.websocket;
+package ch.lorien.chat.websocket;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import com.baeldung.model.Message;
 import com.google.gson.Gson;
+
+import ch.lorien.chat.model.Message;
 
 public class MessageEncoder implements Encoder.Text<Message> {
 
